@@ -1,5 +1,5 @@
 ---
-title: "lab_report_knapsack"
+title: "Lab report knapsack"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{lab_report_knapsack}
@@ -17,3 +17,67 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(lab06)
 ```
+
+## Brute force search
+
+*How much time does it take to run the algorithm for n = 16 objects?*
+
+```{r}
+
+```
+
+## Dynamic programming
+
+*How much time does it take to run the algorithm for n = 500 objects?*
+
+```{r}
+
+```
+
+## Greedy heuristic
+
+*How much time does it take to run the algorithm for n = 1,000,000 objects?*
+
+```{r}
+
+```
+
+## 
+
+## Profiling and optimizing the code
+
+*What performance gain could you get by trying to improve your code?*
+
+```{r}
+
+```
+
+## 
+
+## \* Rcpp implementation
+
+*What performance gain could you get by using Rcpp and C++?*
+
+```{r}
+
+```
+
+## 
+
+## \* Parallelized brute-force search
+
+*What performance gain could you get by parallelizing brute-force search?*
+
+```{r}
+
+```
+
+## 
+
+## \* Profiling and optimizing the Turf API package code
+
+```{r}
+
+```
+
+## 
