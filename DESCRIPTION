@@ -15,10 +15,15 @@ Authors@R: c(
     )
   )
 Description: This package for lab06 in the 732A94 course focuses on writing fast R code. 
-    Three different techniques are implemented for the knapsack problem
-    1,  Brute force search
-    2. Dynamic programming
-    3. Greedy Heuristic    
+    Three different techniques are implemented for the knapsack problem.
+    1,  Brute force search.
+    2. Dynamic programming.
+    3. Greedy Heuristic.  
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Config/roxygen2/version: 8.1.0
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
