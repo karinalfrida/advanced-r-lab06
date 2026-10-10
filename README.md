@@ -18,12 +18,3 @@ You can install the development version of lab06 from [GitHub](https://github.co
 # install.packages("pak")
 pak::pak("karinalfrida/advanced-r-lab06")
 ```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(lab06)
-## basic example code
-```
