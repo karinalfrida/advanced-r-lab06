@@ -1,0 +1,23 @@
+Package: lab06
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Jonas", "Danielsson",
+      email = "jonda228@student.liu.se",
+      role = c("aut", "cre")
+    ),
+    person(
+      "Kerstin", "Arbring",
+      email = "kerar739@student.liu.se",
+      role = c("aut")
+    )
+  )
+Description: This package for lab06 in the 732A94 course focuses on writing fast R code. 
+    Three different techniques are implemented for the knapsack problem: 
+    Brute force search, Dynamic programming, and Greedy Heuristic.
+    
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
