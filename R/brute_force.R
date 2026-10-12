@@ -31,15 +31,15 @@ brute_force_knapsack <- function(x,W) {
     "`x` must be a data.frame." =
       is.data.frame(x),
     "`x` must have exactly two columns named `v` and `w`." =
-      ncol(x) == 2 && all(c("v", "w") %in% names(x)),
+      ncol(x) == 2 & all(c("v", "w") %in% names(x)),
     "Columns `v` and `w` must be numeric." =
-      is.numeric(x$v) && is.numeric(x$w),
+      is.numeric(x$v) & is.numeric(x$w),
     "Columns `v` and `w` must not contain missing values." =
-      !anyNA(x$v) && !anyNA(x$w),
+      !anyNA(x$v) & !anyNA(x$w),
     "Columns `v` and `w` must only contain positive values." =
-      all(x$v > 0) && all(x$w > 0),
+      all(x$v > 0) & all(x$w > 0),
     "`W` must be a positive number." =
-      is.numeric(W) && length(W) == 1 && !is.na(W) && W > 0
+      is.numeric(W) & length(W) == 1 && !is.na(W) & W > 0
   )
 
   # n items
@@ -61,7 +61,7 @@ brute_force_knapsack <- function(x,W) {
     total_value  <- sum(values[combination])    # sum all TRUE values
 
     # Check if the combination is valid and better than the best found so far
-    if (total_weight <= W && total_value > best_value) {
+    if (total_weight <= W & total_value > best_value) {
       best_value    <- total_value
       best_elements <- which(combination)
     }

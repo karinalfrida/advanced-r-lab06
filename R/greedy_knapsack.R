@@ -30,22 +30,22 @@
 #' # Items 4 and 2 fit (total weight 3 + 4 = 7), item 3 would exceed W = 10.
 #' items <- data.frame(v = c(10, 40, 30, 50),
 #'                     w = c(5, 4, 6, 3))
-#' greedy_knapsack_vectorised(x = items, W = 10)
-greedy_knapsack_vectorised <- function(x, W) {
+#' greedy_knapsack(x = items, W = 10)
+greedy_knapsack <- function(x, W) {
   # Validate inputs
-  stopifnot(
+     stopifnot(
     "`x` must be a data.frame." =
       is.data.frame(x),
     "`x` must have exactly two columns named `v` and `w`." =
-      ncol(x) == 2 && all(c("v", "w") %in% names(x)),
+      ncol(x) == 2 & all(c("v", "w") %in% names(x)),
     "Columns `v` and `w` must be numeric." =
-      is.numeric(x$v) && is.numeric(x$w),
+      is.numeric(x$v) & is.numeric(x$w),
     "Columns `v` and `w` must not contain missing values." =
-      !anyNA(x$v) && !anyNA(x$w),
+      !anyNA(x$v) & !anyNA(x$w),
     "Columns `v` and `w` must only contain positive values." =
-      all(x$v > 0) && all(x$w > 0),
+      all(x$v > 0) & all(x$w > 0),
     "`W` must be a positive number." =
-      is.numeric(W) && length(W) == 1 && !is.na(W) && W > 0
+      is.numeric(W) & length(W) == 1 && !is.na(W) & W > 0
   )
 
   # Value per unit of weight for every item sorted best to worst
