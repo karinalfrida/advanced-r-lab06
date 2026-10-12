@@ -35,7 +35,6 @@ greedy_knapsack_vectorised <- function(x, W) {
 }
 
 
-# Version 3: pipe-oriented, working on the data.frame --------------------------
 greedy_knapsack_dplyr <- function(x, W) {
   # Validate inputs
   stopifnot(
