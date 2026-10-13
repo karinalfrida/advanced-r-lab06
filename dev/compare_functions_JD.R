@@ -12,11 +12,19 @@ compare_functions <- function(fun_a, fun_b, args,
                               profile = FALSE,
                               profile_reps = 20) {
 
-  # Benchmark: check = TRUE stops with an error if the results are not equal
+  # Prepare expr (expressions) for bench::mark
+  #
+  # do.call() calls a function using the arguments stored in a list.
+  #  
+  # bquote() keeps a call unevaluated, but allows for substitution of values.
+  # The .() is the syntax for substitution.
+  #
+  #
   exprs <- list(
-    bquote(do.call(.(fun_a), .(args))),
+    bquote(do.call(.(fun_a), .(args))), 
     bquote(do.call(.(fun_b), .(args)))
   )
+  # give the expressions/calculations names
   names(exprs) <- names
 
   timings <- bench::mark(exprs = exprs,
@@ -25,9 +33,11 @@ compare_functions <- function(fun_a, fun_b, args,
                          filter_gc = FALSE)
 
   # Same table, but relative to the fastest function.
+  # So the fastest is 1 and everything else is relative to that.
   relative <- summary(timings, relative = TRUE, filter_gc = FALSE)
 
-  # Optional profiling, adds repetition to fast functions, 20 as standard
+  # Optional profiling, Same thing as above, but with profvis. 
+  # This will open a flame graph in the viewer.
   profiles <- NULL
   if (profile) {
     profiles <- lapply(list(fun_a, fun_b), function(f) {

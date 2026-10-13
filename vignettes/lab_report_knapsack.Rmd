@@ -24,7 +24,7 @@ devtools::load_all()
 *How much time does it take to run the algorithm for n = 16 objects?*
 
 ```{r}
-knapsack_objects <- suppressWarnings(random_numbers_for_knapsack())
+knapsack_objects <- random_numbers_for_knapsack()
 
 # Run bench::mark() once for every combination of the parameters
 runs <- bench::press(
