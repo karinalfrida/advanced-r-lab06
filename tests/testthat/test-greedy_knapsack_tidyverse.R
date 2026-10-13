@@ -1,9 +1,9 @@
-test_that("greedy_knapsack_tidyverse rejects wrong column names in x", {
-  items <- data.frame(value = c(10, 40, 30, 50),
-                      weight = c(5, 4, 6, 3))
+test_that("greedy_knapsack_tidyverse rejects non-positive values in x", {
+  items <- data.frame(v = c(10, 40, 30, 50),
+                      w = c(5, -4, 6, 3))
 
   expect_error(greedy_knapsack_tidyverse(x = items, W = 10),
-               "`x` must have exactly two columns named `v` and `w`.", fixed = TRUE)
+               "Columns `v` and `w` must only contain positive values.", fixed = TRUE)
 })
 
 test_that("greedy_knapsack_tidyverse returns the expected value and elements", {

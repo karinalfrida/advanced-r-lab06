@@ -3,9 +3,8 @@ library(dplyr)
 #' knapsack problem solver, brute force version
 #' using tidyverse functions (and sorting to find the best combination)
 #'
-#' @param x A \code{data.frame} with exactly two numeric columns: \code{v}
-#'   (the value of each item) and \code{w} (the weight of each item). All
-#'   values must be finite positive and non-missing.
+#' @param x A \code{data.frame} with positive, non-missing numeric columns
+#'   \code{v} (item values) and \code{w} (item weights).
 #'
 #' @param W A single positive number giving the weight capacity of the
 #'   knapsack.
@@ -35,6 +34,8 @@ brute_force_knapsack_tidyverse <- function(x,W){
   stopifnot(
     "`x` must be a data.frame." =
       is.data.frame(x),
+    "`x` must have columns named `v` and `w`." =
+      all(c("v", "w") %in% names(x)),
     "Columns `v` and `w` must be numeric." =
       is.numeric(x$v) & is.numeric(x$w),
     "Columns `v` and `w` must not contain missing values." =

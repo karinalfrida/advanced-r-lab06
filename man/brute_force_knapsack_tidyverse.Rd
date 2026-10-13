@@ -8,9 +8,8 @@ using tidyverse functions (and sorting to find the best combination)}
 brute_force_knapsack_tidyverse(x, W)
 }
 \arguments{
-\item{x}{A \code{data.frame} with exactly two numeric columns: \code{v}
-(the value of each item) and \code{w} (the weight of each item). All
-values must be finite positive and non-missing.}
+\item{x}{A \code{data.frame} with positive, non-missing numeric columns
+\code{v} (item values) and \code{w} (item weights).}
 
 \item{W}{A single positive number giving the weight capacity of the
 knapsack.}
