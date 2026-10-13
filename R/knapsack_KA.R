@@ -3,6 +3,10 @@ library(dplyr)
 #' knapsack problem solver, brute force version
 #' using tidyverse functions (and sorting to find the best combination)
 #'
+#' @param x A \code{data.frame} with exactly two numeric columns: \code{v}
+#'   (the value of each item) and \code{w} (the weight of each item). All
+#'   values must be finite positive and non-missing.
+#'
 #' @param W A single positive number giving the weight capacity of the
 #'   knapsack.
 #'
@@ -17,6 +21,8 @@ library(dplyr)
 #' @references
 #' \url{https://en.wikipedia.org/wiki/Knapsack_problem}
 #'
+#' @importFrom dplyr tibble mutate select filter arrange
+#' @importFrom purrr map map_dbl
 #' @export
 #'
 #' @examples
@@ -71,7 +77,7 @@ brute_force_knapsack_tidyverse <- function(x,W){
 #' knapsack problem solver, dynamic programming version
 #' <
 #'
-#' A \code{data.frame} with exactly two numeric columns: \code{v}
+#' @param x A \code{data.frame} with exactly two numeric columns: \code{v}
 #'   (the value of each item) and \code{w} (the weight of each item). All
 #'   values must be positive and non-missing.
 #' @param W A single positive number giving the weight capacity of the
@@ -90,7 +96,6 @@ brute_force_knapsack_tidyverse <- function(x,W){
 #' \url{https://en.wikipedia.org/wiki/Knapsack_problem#Dynamic_programming_in-advance_algorithm>}
 #' @export
 #'
-#' @examples
 knapsack_dynamic <- function(x,W){
 
   # pack_knapsack_recursive <- function(i,j){
