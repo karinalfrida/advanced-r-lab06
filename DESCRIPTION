@@ -29,6 +29,7 @@ Imports:
 Suggests: 
     bench,
     knitr,
+    profvis,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr

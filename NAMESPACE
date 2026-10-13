@@ -2,6 +2,7 @@
 
 export(brute_force_knapsack)
 export(brute_force_knapsack_tidyverse)
+export(compare_functions)
 export(greedy_knapsack)
 export(greedy_knapsack_tidyverse)
 export(knapsack_dynamic)

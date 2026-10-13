@@ -83,8 +83,14 @@ cat("It takes about", format(res_greed$median), "(median)")
 
 *What performance gain could you get by trying to improve your code?*
 
-```{r}
+Base R (`a`) vs tidyverse (`b`) versions, relative to the fastest (= 1).
 
+```{r}
+compare_functions(greedy_knapsack, greedy_knapsack_tidyverse,
+                  args = list(x = knapsack_objects_large, W = 3500))$timings
+
+compare_functions(brute_force_knapsack, brute_force_knapsack_tidyverse,
+                  args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
 ```
 
 ## 
