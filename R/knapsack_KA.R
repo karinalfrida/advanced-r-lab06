@@ -1,30 +1,120 @@
 library(dplyr)
 
-knapsack_brute_force_KA <- function(x,W){
-  stopifnot("x must be a data frame" =is.data.frame(x),
-            "columns names v and w must be present in the data frame" =
-              all(c("v", "w") %in% names(testdf)),
-            "Only positive values are allowed in c and v" = all((x$c>0), (x$w > 0)))
+#' knapsack problem solver, brute force version
+#' using tidyverse functions (and sorting to find the best combination)
+#'
+#' @param W A single positive number giving the weight capacity of the
+#'   knapsack.
+#'
+#' @returns A list with two elements:
+#'   \describe{
+#'     \item{\code{value}}{The maximum total value of the knapsack, rounded to
+#'       the nearest integer.}
+#'     \item{\code{elements}}{An integer vector with the row indices of
+#'       \code{x} for the items in the optimal knapsack.}
+#'   }
+#'
+#' @references
+#' \url{https://en.wikipedia.org/wiki/Knapsack_problem}
+#'
+#' @export
+#'
+#' @examples
+#' # Four items. The best knapsack with capacity 10 is items 2 and 4
+#' # (total weight 4 + 3 = 7, total value 40 + 50 = 90).
+#' items <- data.frame(v = c(10, 40, 30, 50),
+#'                     w = c(5, 4, 6, 3))
+#' brute_force_knapsack(x = items, W = 10)
+brute_force_knapsack_tidyverse <- function(x,W){
+  stopifnot(
+    "`x` must be a data.frame." =
+      is.data.frame(x),
+    "`x` must have two columns named `v` and `w`." =
+      all(c("v", "w") %in% names(x)),
+    "Columns `v` and `w` must be numeric." =
+      is.numeric(x$v) & is.numeric(x$w),
+    "Columns `v` and `w` must not contain missing values." =
+      !anyNA(x[, c("v", "w")]),
+    "Columns `v` and `w` must only contain finite, positive values." =
+      all((x$v>0), (x$w > 0), is.finite(x$v), is.finite(x$v)),
+    "`W` must be a positive number." =
+      is.numeric(W) & length(W) == 1 && !is.na(W) & W > 0
+  )
+
+  # n items
   n = nrow(x)
 
+  # Extract the item weights and values as plain vectors
+  weights <- x$w
+  values <- x$v
+
+
   knapsack_packed <-
-    tibble(rows=2^n) |>
-    mutate(bits = purrr::map(row_number() - 1,
-                      \(x) as.integer(intToBits(x))[1:4]))
-
-   # mutate(bits = row_number() |>intToBits() |> as.integer )
-
-  # bits <-
-  #   vector(length = n) |>
-  #   intToBits()
+    dplyr::tibble(nr = 0:(2^n - 1)) |>
+    dplyr::mutate(combination = purrr::map(nr, \(i) as.logical(intToBits(i)[1:n]))) |>
+    dplyr::mutate(
+      weight = purrr::map_dbl(combination, \(selected) sum(weights[selected])),
+      value = purrr::map_dbl(combination, \(selected) sum(values[selected]))
+    ) |>
+    dplyr::filter(weight <= W) |>
+    dplyr::arrange(desc(value)) |>
+    head(1) |>
+    dplyr::select(combination, value) |>
+    (\(result) list(
+      value = result$value[[1]],
+      elements = which(result$combination[[1]])
+    ))()
 
   return(knapsack_packed)
 }
 
+#' knapsack problem solver, dynamic programming version
+#' <
+#'
+#' A \code{data.frame} with exactly two numeric columns: \code{v}
+#'   (the value of each item) and \code{w} (the weight of each item). All
+#'   values must be positive and non-missing.
+#' @param W A single positive number giving the weight capacity of the
+#'   knapsack.
+#'
+#' @returns A list with two elements:
+#'   \describe{
+#'     \item{\code{value}}{The maximum total value of the knapsack, rounded to
+#'       the nearest integer.}
+#'     \item{\code{elements}}{An integer vector with the row indices of
+#'       \code{x} for the items in the optimal knapsack.}
+#'   }
+#'
+#'#' @references
+#' \url{https://en.wikipedia.org/wiki/Knapsack_problem}
+#' \url{https://en.wikipedia.org/wiki/Knapsack_problem#Dynamic_programming_in-advance_algorithm>}
+#' @export
+#'
+#' @examples
+knapsack_dynamic <- function(x,W){
 
-bits =
-  8 |>
-  intToBits() |>
-  as.integer() |>
-  (\(x) x[1:n])() |>
-  vector()
+  pack_knapsack_recursive <- function(i,j){
+
+  }
+
+  stopifnot(
+    "`x` must be a data.frame." =
+      is.data.frame(x),
+    "`x` must have two columns named `v` and `w`." =
+      all(c("v", "w") %in% names(x)),
+    "Columns `v` and `w` must be numeric." =
+      is.numeric(x$v) & is.numeric(x$w),
+    "Columns `v` and `w` must not contain missing values." =
+      !anyNA(x[, c("v", "w")]),
+    "Columns `v` and `w` must only contain finite, positive values." =
+      all((x$v>0), (x$w > 0), is.finite(x$v), is.finite(x$v)),
+    "`W` must be a positive number." =
+      is.numeric(W) & length(W) == 1 && !is.na(W) & W > 0
+  )
+
+  # n items
+  n <- nrow(x)
+
+
+
+}
