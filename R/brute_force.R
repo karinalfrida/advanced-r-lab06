@@ -39,7 +39,7 @@ brute_force_knapsack <- function(x,W) {
     "Columns `v` and `w` must only contain positive values." =
       all(x$v > 0) & all(x$w > 0),
     "`W` must be a positive number." =
-      is.numeric(W) & length(W) == 1 && !is.na(W) & W > 0
+      is.numeric(W) & length(W) == 1 & !is.na(W) & W > 0
   )
 
   # n items

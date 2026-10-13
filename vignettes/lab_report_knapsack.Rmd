@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-#library(lab06)
+library(lab06)
 ```
 
 ## Brute force search

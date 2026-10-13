@@ -5,6 +5,7 @@ export(brute_force_knapsack_tidyverse)
 export(greedy_knapsack)
 export(greedy_knapsack_tidyverse)
 export(knapsack_dynamic)
+export(random_numbers_for_knapsack)
 importFrom(dplyr,
   arrange,
   filter,
