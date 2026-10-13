@@ -5,6 +5,8 @@
 #'
 #' @returns A data frame
 #'
+#' @export
+#'
 random_numbers_for_knapsack <-  function(n = 2000){
   RNGversion(min(as.character(getRversion()),"3.5.3"))
 

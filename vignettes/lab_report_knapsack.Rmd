@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-#library(lab06)
+library(lab06)
 ```
 
 ## Brute force search
@@ -23,7 +23,25 @@ knitr::opts_chunk$set(
 *How much time does it take to run the algorithm for n = 16 objects?*
 
 ```{r}
+knapsack_objects <- random_numbers_for_knapsack()
 
+# Run bench::mark() once for every combination of the parameters
+runs <- bench::press(
+  n = c(8, 12, 16, 20),
+  W = 3500,
+  {
+    bench::mark(brute_force_knapsack(x = knapsack_objects[1:n, ], W = W),
+                filter_gc = FALSE)
+  },
+  .quiet = TRUE
+)
+
+# Show the results in a table
+runs[, c("n", "W", "min", "median", "itr/sec", "mem_alloc")]
+```
+
+```{r, echo=FALSE}
+cat("It takes about", format(runs$median[runs$n == 16]), "(median)")
 ```
 
 ## Dynamic programming
@@ -31,7 +49,14 @@ knitr::opts_chunk$set(
 *How much time does it take to run the algorithm for n = 500 objects?*
 
 ```{r}
+res_dynamic <- bench::mark(knapsack_dynamic(x = knapsack_objects[1:500, ], W = 3500),
+                           filter_gc = FALSE)
 
+res_dynamic[, c("min", "median", "itr/sec", "mem_alloc")]
+```
+
+```{r, echo=FALSE}
+cat("It takes about", format(res_dynamic$median), "(median)")
 ```
 
 ## Greedy heuristic
@@ -39,7 +64,16 @@ knitr::opts_chunk$set(
 *How much time does it take to run the algorithm for n = 1,000,000 objects?*
 
 ```{r}
+knapsack_objects_large <- suppressWarnings(random_numbers_for_knapsack(n = 1e6))
 
+res_greed <- bench::mark(greedy_knapsack(x = knapsack_objects_large, W = 3500),
+                         filter_gc = FALSE)
+
+res_greed[, c("min", "median", "itr/sec", "mem_alloc")]
+```
+
+```{r, echo=FALSE}
+cat("It takes about", format(res_greed$median), "(median)")
 ```
 
 ## 
@@ -48,8 +82,28 @@ knitr::opts_chunk$set(
 
 *What performance gain could you get by trying to improve your code?*
 
-```{r}
+Base R (`a`) vs tidyverse (`b`) versions, relative to the fastest (= 1).
 
+```{r}
+compare_functions(greedy_knapsack, greedy_knapsack_tidyverse,
+                  args = list(x = knapsack_objects_large, W = 3500))$timings
+
+compare_functions(brute_force_knapsack, brute_force_knapsack_tidyverse,
+                  args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
+```
+
+Brute force keeping only the best so far (`a`) vs saving all combinations in a data.frame (`b`).
+
+```{r}
+compare_functions(brute_force_knapsack, brute_force_knapsack_df,
+                  args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
+```
+
+Brute force with a loop (`a`) vs all combinations as a 0/1 matrix and matrix products (`b`).
+
+```{r}
+compare_functions(brute_force_knapsack, brute_force_knapsack_matrix,
+                  args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
 ```
 
 ## 
@@ -64,20 +118,4 @@ knitr::opts_chunk$set(
 
 ## 
 
-## \* Parallelized brute-force search
 
-*What performance gain could you get by parallelizing brute-force search?*
-
-```{r}
-
-```
-
-## 
-
-## \* Profiling and optimizing the Turf API package code
-
-```{r}
-
-```
-
-## 

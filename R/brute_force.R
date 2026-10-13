@@ -1,8 +1,7 @@
 #' Brute force search for the knapsack problem
 #'
-#' @param x A \code{data.frame} with exactly two numeric columns: \code{v}
-#'   (the value of each item) and \code{w} (the weight of each item). All
-#'   values must be positive and non-missing.
+#' @param x A \code{data.frame} with positive, non-missing numeric columns
+#'   \code{v} (item values) and \code{w} (item weights).
 #' @param W A single positive number giving the weight capacity of the
 #'   knapsack.
 #'
@@ -30,8 +29,8 @@ brute_force_knapsack <- function(x,W) {
      stopifnot(
     "`x` must be a data.frame." =
       is.data.frame(x),
-    "`x` must have exactly two columns named `v` and `w`." =
-      ncol(x) == 2 & all(c("v", "w") %in% names(x)),
+    "`x` must have columns named `v` and `w`." =
+      all(c("v", "w") %in% names(x)),
     "Columns `v` and `w` must be numeric." =
       is.numeric(x$v) & is.numeric(x$w),
     "Columns `v` and `w` must not contain missing values." =
@@ -39,7 +38,7 @@ brute_force_knapsack <- function(x,W) {
     "Columns `v` and `w` must only contain positive values." =
       all(x$v > 0) & all(x$w > 0),
     "`W` must be a positive number." =
-      is.numeric(W) & length(W) == 1 && !is.na(W) & W > 0
+      is.numeric(W) & length(W) == 1 & !is.na(W) & W > 0
   )
 
   # n items

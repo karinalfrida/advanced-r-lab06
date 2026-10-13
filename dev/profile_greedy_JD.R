@@ -34,3 +34,14 @@ p_dplyr <- profvis({
 print(p_dplyr)
 
 
+
+x <- random_numbers_for_knapsack()
+
+
+profvis({
+brute_force_knapsack_df(x, W=3500)
+}) |> print()
+
+compare_functions(brute_force_knapsack, brute_force_knapsack_df,
+                  args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
+
