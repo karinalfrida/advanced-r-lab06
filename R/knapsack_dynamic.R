@@ -47,7 +47,6 @@ knapsack_dynamic <- function(x,W){
   M <- matrix(0, nrow = n + 1, ncol = W + 1)
 
   for (i in seq_len(n)) {
-    print(i)
     for (w in 0:W) {
 
       # row i+1 in matrix corresponds to object i in x

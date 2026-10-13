@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(lab06)
+devtools::load_all()
+#library(lab06)
 ```
 
 ## Brute force search
@@ -49,7 +50,14 @@ cat("It takes about", format(runs$median[runs$n == 16]), "(median)")
 *How much time does it take to run the algorithm for n = 500 objects?*
 
 ```{r}
+res_dynamic <- bench::mark(knapsack_dynamic(x = knapsack_objects[1:500, ], W = 3500),
+                           filter_gc = FALSE)
 
+res_dynamic[, c("min", "median", "itr/sec", "mem_alloc")]
+```
+
+```{r, echo=FALSE}
+cat("It takes about", format(res_dynamic$median), "(median)")
 ```
 
 ## Greedy heuristic
