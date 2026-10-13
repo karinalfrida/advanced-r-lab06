@@ -34,11 +34,11 @@ brute_force_knapsack_tidyverse <- function(x,W){
     "Columns `v` and `w` must be numeric." =
       is.numeric(x$v) & is.numeric(x$w),
     "Columns `v` and `w` must not contain missing values." =
-      !anyNA(x[, c("v", "w")]),
+      !anyNA(x$v) & !anyNA(x$w),
     "Columns `v` and `w` must only contain finite, positive values." =
       all((x$v>0), (x$w > 0), is.finite(x$v), is.finite(x$v)),
     "`W` must be a positive number." =
-      is.numeric(W) & length(W) == 1 && !is.na(W) & W > 0
+      is.numeric(W) & length(W) == 1 & !is.na(W) & W > 0
   )
 
   # n items
@@ -60,8 +60,8 @@ brute_force_knapsack_tidyverse <- function(x,W){
     dplyr::arrange(desc(value)) |>
     head(1) |>
     dplyr::select(combination, value) |>
-    (\(result) list(
-      value = result$value[[1]],
+    (function(result) list(
+      value = round(result$value[[1]]),
       elements = which(result$combination[[1]])
     ))()
 
@@ -81,7 +81,7 @@ brute_force_knapsack_tidyverse <- function(x,W){
 #'   \describe{
 #'     \item{\code{value}}{The maximum total value of the knapsack, rounded to
 #'       the nearest integer.}
-#'     \item{\code{elements}}{An integer vector with the row indices of
+#'     \item{\code{items}}{An integer vector with the row indices of
 #'       \code{x} for the items in the optimal knapsack.}
 #'   }
 #'
@@ -93,9 +93,9 @@ brute_force_knapsack_tidyverse <- function(x,W){
 #' @examples
 knapsack_dynamic <- function(x,W){
 
-  pack_knapsack_recursive <- function(i,j){
-
-  }
+  # pack_knapsack_recursive <- function(i,j){
+  #
+  # }
 
   stopifnot(
     "`x` must be a data.frame." =
@@ -115,6 +115,42 @@ knapsack_dynamic <- function(x,W){
   # n items
   n <- nrow(x)
 
+  # row and column for zero objects/capacity
+  M <- matrix(0, nrow = n + 1, ncol = W + 1)
+
+  for (i in seq_len(n)) {
+    print(i)
+    for (w in 0:W) {
+
+      # row i+1 in matrix corresponds to object i in x
+      if (x$w[i] > w) {
+        M[i + 1, w + 1] <- M[i, w + 1]
+      } else {
+        exclude <- M[i, w + 1]
+        include <- x$v[i] + M[i, w - x$w[i] + 1]
+
+        M[i + 1, w + 1] <- max(exclude, include)
+      }
+    }
+  }
+
+  best_value <- M[n+1, W+1]
+
+  # trace back to find which items are selected
+  items_selected <- integer(0)
+  for (i in n:1) {
+
+    if (M[i + 1, w + 1] != M[i, w + 1]) {
+
+      # object i was included
+      items_selected <- c(i, items_selected)
+
+      # subtract its weight
+      w <- w - x$w[i]
+    }
+  }
+
+  return(list(value = best_value, items = items_selected))
 
 
 }

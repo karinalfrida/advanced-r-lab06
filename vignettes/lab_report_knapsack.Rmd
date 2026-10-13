@@ -21,7 +21,6 @@ devtools::load_all()
 
 ## Brute force search
 
-
 *How much time does it take to run the algorithm for n = 16 objects?*
 
 ```{r}
