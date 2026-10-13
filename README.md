@@ -2,6 +2,8 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/karinalfrida/advanced-r-lab06/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/karinalfrida/advanced-r-lab06/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 The goal of lab06 in the 732A94 course is to study technique used to writing fast R code. Three different techniques are implemented for the knapsack problem <https://en.wikipedia.org/wiki/Knapsack_problem> :
