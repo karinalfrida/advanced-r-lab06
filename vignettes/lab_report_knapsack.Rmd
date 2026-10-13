@@ -15,8 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-devtools::load_all()
-#library(lab06)
+library(lab06)
 ```
 
 ## Brute force search
@@ -93,6 +92,20 @@ compare_functions(brute_force_knapsack, brute_force_knapsack_tidyverse,
                   args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
 ```
 
+Brute force keeping only the best so far (`a`) vs saving all combinations in a data.frame (`b`).
+
+```{r}
+compare_functions(brute_force_knapsack, brute_force_knapsack_df,
+                  args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
+```
+
+Brute force with a loop (`a`) vs all combinations as a 0/1 matrix and matrix products (`b`).
+
+```{r}
+compare_functions(brute_force_knapsack, brute_force_knapsack_matrix,
+                  args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
+```
+
 ## 
 
 ## \* Rcpp implementation
@@ -105,20 +118,4 @@ compare_functions(brute_force_knapsack, brute_force_knapsack_tidyverse,
 
 ## 
 
-## \* Parallelized brute-force search
 
-*What performance gain could you get by parallelizing brute-force search?*
-
-```{r}
-
-```
-
-## 
-
-## \* Profiling and optimizing the Turf API package code
-
-```{r}
-
-```
-
-## 
