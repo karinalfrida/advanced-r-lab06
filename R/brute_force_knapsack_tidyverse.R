@@ -35,8 +35,6 @@ brute_force_knapsack_tidyverse <- function(x,W){
   stopifnot(
     "`x` must be a data.frame." =
       is.data.frame(x),
-    "`x` must have two columns named `v` and `w`." =
-      all(c("v", "w") %in% names(x)),
     "Columns `v` and `w` must be numeric." =
       is.numeric(x$v) & is.numeric(x$w),
     "Columns `v` and `w` must not contain missing values." =
