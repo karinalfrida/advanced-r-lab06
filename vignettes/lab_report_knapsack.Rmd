@@ -24,7 +24,25 @@ devtools::load_all()
 *How much time does it take to run the algorithm for n = 16 objects?*
 
 ```{r}
+knapsack_objects <- suppressWarnings(random_numbers_for_knapsack())
 
+# Run bench::mark() once for every combination of the parameters
+runs <- bench::press(
+  n = c(8, 12, 16, 20),
+  W = 3500,
+  {
+    bench::mark(brute_force_knapsack(x = knapsack_objects[1:n, ], W = W),
+                filter_gc = FALSE)
+  },
+  .quiet = TRUE
+)
+
+# Show the results in a table
+runs[, c("n", "W", "min", "median", "itr/sec", "mem_alloc")]
+```
+
+```{r, echo=FALSE}
+cat("It takes about", format(runs$median[runs$n == 16]), "(median)")
 ```
 
 ## Dynamic programming
@@ -40,7 +58,16 @@ devtools::load_all()
 *How much time does it take to run the algorithm for n = 1,000,000 objects?*
 
 ```{r}
+knapsack_objects_large <- suppressWarnings(random_numbers_for_knapsack(n = 1e6))
 
+res_greed <- bench::mark(greedy_knapsack(x = knapsack_objects_large, W = 3500),
+                         filter_gc = FALSE)
+
+res_greed[, c("min", "median", "itr/sec", "mem_alloc")]
+```
+
+```{r, echo=FALSE}
+cat("It takes about", format(res_greed$median), "(median)")
 ```
 
 ## 
