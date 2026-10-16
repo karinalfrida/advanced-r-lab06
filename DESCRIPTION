@@ -25,7 +25,8 @@ LazyData: true
 Config/roxygen2/version: 8.1.0
 Imports:
     dplyr,
-    purrr
+    purrr,
+    Rcpp
 Suggests: 
     bench,
     knitr,
@@ -34,3 +35,5 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+LinkingTo: 
+    Rcpp

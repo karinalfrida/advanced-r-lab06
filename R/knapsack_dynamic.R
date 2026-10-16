@@ -10,7 +10,7 @@
 #'   \describe{
 #'     \item{\code{value}}{The maximum total value of the knapsack, rounded to
 #'       the nearest integer.}
-#'     \item{\code{items}}{An integer vector with the row indices of
+#'     \item{\code{elements}}{An integer vector with the row indices of
 #'       \code{x} for the items in the optimal knapsack.}
 #'   }
 #'
@@ -77,7 +77,7 @@ knapsack_dynamic <- function(x,W){
     }
   }
 
-  return(list(value = best_value, items = items_selected))
+  return(list(value = best_value, elements = items_selected))
 
 
 }

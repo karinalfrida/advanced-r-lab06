@@ -19,7 +19,7 @@ A list with two elements:
   \describe{
     \item{\code{value}}{The maximum total value of the knapsack, rounded to
       the nearest integer.}
-    \item{\code{items}}{An integer vector with the row indices of
+    \item{\code{elements}}{An integer vector with the row indices of
       \code{x} for the items in the optimal knapsack.}
   }
 

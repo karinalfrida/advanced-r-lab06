@@ -4,7 +4,7 @@
 \alias{brute_force_knapsack}
 \title{Brute force search for the knapsack problem}
 \usage{
-brute_force_knapsack(x, W)
+brute_force_knapsack(x, W, fast = FALSE)
 }
 \arguments{
 \item{x}{A \code{data.frame} with positive, non-missing numeric columns
@@ -12,6 +12,9 @@ brute_force_knapsack(x, W)
 
 \item{W}{A single positive number giving the weight capacity of the
 knapsack.}
+
+\item{fast}{A logical value. If \code{TRUE}, the function will use a C++.
+Default to \code{FALSE}}
 }
 \value{
 A list with two elements:
