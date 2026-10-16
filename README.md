@@ -20,3 +20,5 @@ You can install the development version of lab06 from [GitHub](https://github.co
 # install.packages("pak")
 pak::pak("karinalfrida/advanced-r-lab06")
 ```
+
+The package vignette can then be displayed calling `r browseVignettes("lab06")`

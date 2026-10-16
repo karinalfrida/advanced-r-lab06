@@ -2,7 +2,7 @@
 title: "Lab report knapsack"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{lab_report_knapsack}
+  %\VignetteIndexEntry{Lab report knapsack}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,12 +18,65 @@ knitr::opts_chunk$set(
 library(lab06)
 ```
 
+## Introduction
+
+This document serves as a lab report for lan 6 in the Advanced R programming course (732A94) autumn 2026. This lab focuses on comparing different techniques for improving the R code execution time. The techniques are applied to the knapsack (1-0) problem.
+
+We use a brute force search algorithm, a dynamic programming algorithm, and a "greedy" (approximative) algorithm, in different version, measuring and comparing their respective performances. Questions from the lab assignment are answered for each algorithm/
+
 ## Brute force search
+
+The brute force search checks every possible combination of objects. In this version two variables are used to keep track of the best solution so far, comparing this to the next check, and updating it if the next combination is better.
+
+We use the base function ìntToBits() to create a representation for each combination (using the binary representation of all numbers from 0 up to n-1, where n is the number of available objects to choose from, and converting it to logicals).
+
+The parameter `fast` is kept at its default = `FALSE` here, see Rccp/C++ below for its alternative use.
+
+```{r, eval = FALSE, echo = TRUE}
+brute_force_knapsack <- function(x,W, fast = FALSE) {
+
+  # If fast = TRUE, use the C++ implementation
+  if (fast) {
+    return(knapsack_cpp(x, W))
+  }
+
+   # / input validation code not shown here, see source code in package/ *
+
+  # n items
+  n <- nrow(x)
+
+  # Extract the item weights and values as plain vectors
+  weights <- x$w
+  values <- x$v
+
+  # variables to keep track of the best solution
+  best_value    <- 0
+  best_elements <- integer(0)
+
+  # Generate all possible combinations of items
+  for (i in 0:(2^n - 1)) {
+    # Logical combination in binary representation ex: {000, 001, ..., 111} for n = 3
+    combination <- as.logical(intToBits(i)[seq_len(n)])
+    total_weight <- sum(weights[combination])   # sum all TRUE values
+    total_value  <- sum(values[combination])    # sum all TRUE values
+
+    # Check if the combination is valid and better than the best found so far
+    if (total_weight <= W & total_value > best_value) {
+      best_value    <- total_value
+      best_elements <- which(combination)
+    }
+  }
+
+  # Return the result in a list
+  list(value = round(best_value), elements = best_elements)
+}
+
+```
 
 *How much time does it take to run the algorithm for n = 16 objects?*
 
 ```{r}
-knapsack_objects <- random_numbers_for_knapsack()
+knapsack_objects <- random_numbers_for_knapsack(n=2000)
 
 # Run bench::mark() once for every combination of the parameters
 runs <- bench::press(
@@ -46,6 +99,57 @@ cat("It takes about", format(runs$median[runs$n == 16]), "(median)")
 
 ## Dynamic programming
 
+The dynamic programming version is based on an algorithm described on [Wikipedia](https://en.wikipedia.org/wiki/Knapsack_problem#Dynamic_programming_in-advance_algorithm "Knapsack algorithms"). Here we create a matrix which the algorithm then walks through line by line, comparing object combinations, having the best one ready when the last element is processed.
+
+```{r, eval = FALSE, echo = TRUE}
+knapsack_dynamic <- function(x,W){
+
+  # / input validation code not shown here, see source code in package/ *
+
+  # n items
+  n <- nrow(x)
+
+  # row and column for zero objects/capacity
+  M <- matrix(0, nrow = n + 1, ncol = W + 1)
+
+  for (i in seq_len(n)) {
+    for (w in 0:W) {
+
+      # row i+1 in matrix corresponds to object i in x
+      if (x$w[i] > w) {
+        M[i + 1, w + 1] <- M[i, w + 1]
+      } else {
+        exclude <- M[i, w + 1]
+        include <- x$v[i] + M[i, w - x$w[i] + 1]
+
+        M[i + 1, w + 1] <- max(exclude, include)
+      }
+    }
+  }
+
+  best_value <- M[n+1, W+1]
+
+  # trace back to find which items are selected
+  items_selected <- integer(0)
+  for (i in n:1) {
+
+    if (M[i + 1, w + 1] != M[i, w + 1]) {
+
+      # object i was included
+      items_selected <- c(i, items_selected)
+
+      # subtract its weight
+      w <- w - x$w[i]
+    }
+  }
+
+  return(list(value = best_value, items = items_selected))
+
+
+}
+
+```
+
 *How much time does it take to run the algorithm for n = 500 objects?*
 
 ```{r}
@@ -60,6 +164,32 @@ cat("It takes about", format(res_dynamic$median), "(median)")
 ```
 
 ## Greedy heuristic
+
+The greedy heuristic algorithm calculates "value per weight unit" for each of the objects, sorts the result in descending order, and then starts picking objects from the top. The result will not necessarily be the optimal total knapsack value, but the algorithm promises to do the task quickly!
+
+```{r, eval = FALSE, echo = TRUE}
+
+greedy_knapsack <- function(x, W) {
+  # / input validation code not shown here, see source code in package/ *
+  
+  # Value per unit of weight for every item sorted best to worst
+  ratio <- x$v / x$w
+  item_order <- order(ratio, decreasing = TRUE)
+  
+  # Running total weight for the items added in that order
+  running_weight <- cumsum(x$w[item_order])
+  
+  # All items less than or equal to the capacity fit in the knapsack
+  fits <- running_weight <= W
+  
+  # Keep the rows that fit and add up their values
+  selected_items <- item_order[fits]
+  total_value    <- sum(x$v[selected_items])
+  
+  return(list(value = round(total_value), elements = selected_items))
+}
+
+```
 
 *How much time does it take to run the algorithm for n = 1,000,000 objects?*
 
@@ -76,9 +206,85 @@ res_greed[, c("min", "median", "itr/sec", "mem_alloc")]
 cat("It takes about", format(res_greed$median), "(median)")
 ```
 
-## 
 
 ## Profiling and optimizing the code
+
+We created a function `compare_functions` for benchmarking paris of functions. 
+
+
+```{r, eval = FALSE, echo = TRUE}
+compare_functions <- function(fun_a, fun_b, args,
+                              names = c("a", "b"),
+                              min_iterations = 10,
+                              check = TRUE,
+                              profile = FALSE,
+                              profile_reps = 20) {
+
+  # Benchmark both functions using the same arguments.
+  # read ?beanch::mark for more details on the arguments.
+  timings <- bench::mark(
+    a = do.call(fun_a, args), # "Do call function with these arguments"
+    b = do.call(fun_b, args),
+    min_iterations = min_iterations,
+    check = check,
+    filter_gc = FALSE
+  )
+```
+
+We implemented "tidyverse" versions of the brute force and greedy algorithms.
+
+```{r, eval = FALSE, echo = TRUE}
+# brute force
+brute_force_knapsack_tidyverse <- function(x,W){
+   # / input validation code not shown here, see source code in package/ *
+
+  # n items
+  n = nrow(x)
+
+  # Extract the item weights and values as plain vectors
+  weights <- x$w
+  values <- x$v
+
+  knapsack_packed <-
+    dplyr::tibble(nr = 0:(2^n - 1)) |>
+    dplyr::mutate(combination = purrr::map(nr, \(i) as.logical(intToBits(i)[1:n]))) |>
+    dplyr::mutate(
+      weight = purrr::map_dbl(combination, \(selected) sum(weights[selected])),
+      value = purrr::map_dbl(combination, \(selected) sum(values[selected]))
+    ) |>
+    dplyr::filter(weight <= W) |>
+    dplyr::arrange(desc(value)) |>
+    utils::head(1) |>
+    dplyr::select(combination, value) |>
+    (function(result) list(
+      value = round(result$value[[1]]),
+      elements = which(result$combination[[1]])
+    ))()
+
+  return(knapsack_packed)
+}
+
+# greedy
+greedy_knapsack_tidyverse <- function(x, W) {
+ # / input validation code not shown here, see source code in package/ *
+
+  selected <- x |>
+    dplyr::mutate(
+      item = dplyr::row_number(),
+      ratio = v / w
+    ) |>
+    dplyr::arrange(dplyr::desc(ratio)) |>
+    dplyr::mutate(running_weight = cumsum(w)) |>
+    dplyr::filter(running_weight <= .env$W) # .env used to fix bug (if x has column named W)
+
+  selected_items <- selected$item
+  total_value    <- sum(selected$v)
+
+  return(list(value = round(total_value), elements = selected_items))
+}
+
+```
+
 
 *What performance gain could you get by trying to improve your code?*
 
@@ -106,16 +312,196 @@ compare_functions(brute_force_knapsack, brute_force_knapsack_matrix,
                   args = list(x = knapsack_objects[1:12, ], W = 3500))$timings
 ```
 
-## 
+To look further into what parts of the `brute_force_knapsack_tidyverse` function are the "heaviest", we did a bench mark test for the pipe sequence split into parts.
+
+
+```{r}
+
+knapsack_objects <- random_numbers_for_knapsack(n=2000)
+
+# variables assigned to replace the function call arguments 
+x <- knapsack_objects[1:12, ]
+W <- 3500
+
+n <- nrow(x)
+weights <- x$w
+values <- x$v
+
+
+b1 <- bench::mark(
+  knapsack_packed_1 <-
+    dplyr::tibble(nr = 0:(2^n - 1)) |>
+    dplyr::mutate(combination = purrr::map(nr, \(i) as.logical(intToBits(i)[1:n]))),
+  iterations = 100)
+
+
+b2 <- bench::mark(
+  knapsack_packed_2 <-
+    knapsack_packed_1 |>
+    dplyr::mutate(
+      weight = purrr::map_dbl(combination, \(selected) sum(weights[selected])),
+      value = purrr::map_dbl(combination, \(selected) sum(values[selected]))
+    ),
+  iterations = 100)
+
+
+b3 <- bench::mark(
+  knapsack_packed_3 <-
+    knapsack_packed_2 |>
+    dplyr::filter(weight <= W),
+  iterations = 100)
+
+
+b4 <- bench::mark(
+  knapsack_packed_4 <-
+    knapsack_packed_3 |>
+    dplyr::arrange(desc(value)) |>
+    head(1),
+  iterations = 100)
+
+
+b5 <- bench::mark(
+  knapsack_packed_5 <-
+    knapsack_packed_4 |>
+    dplyr::select(combination, value) |>
+    (function(result) list(
+      value = round(result$value[[1]]),
+      elements = which(result$combination[[1]])
+    ))(),
+  iterations = 100)
+
+benchmark_results <- dplyr::bind_rows(
+  b1=b1,b2=b2,b3=b3,b4=b4,b5=b5,
+  .id = "stage")
+  
+```
+
+
+Somewhat to our surprise, the results indicate that the most demanding parts of the `brute_force_knapsack_tidyverse` function is the weights and values assigments to the objects, and the creation of the logical representation of the combinations - not the arrange() call we anticipated to find:
+
+```{r, echo = FALSE}
+# Display results
+benchmark_results |>
+  dplyr::select(stage, median, mem_alloc) |> 
+  knitr::kable()
+```
 
 ## \* Rcpp implementation
 
 *What performance gain could you get by using Rcpp and C++?*
 
-```{r}
+We did a Rccp/C++ implementation of the brute force algorithm to compare its execution speed with the "original" R code implementation. The C++ version is run when the `fast` parameter is set to `TRUE` when calling the `brute_force` function.
 
+```cpp
+#include <Rcpp.h>
+#include <cstdint>
+using namespace Rcpp;
+
+// Make this function callable from R through Rcpp
+// [[Rcpp::export]]
+List knapsack_cpp(SEXP x_input, SEXP W_input) {
+
+  // Validate inputs 
+  if (!Rf_inherits(x_input, "data.frame")) {
+    stop("`x` must be a data.frame.");
+  }
+  DataFrame x(x_input);
+
+  if (!x.containsElementNamed("v") || !x.containsElementNamed("w")) {
+    stop("`x` must have columns named `v` and `w`.");
+  }
+
+  // Equivalent to is.numeric() in R: integer (not factor) or double
+  auto is_numeric = [](SEXP s) {
+    return (TYPEOF(s) == INTSXP && !Rf_isFactor(s)) || TYPEOF(s) == REALSXP;
+  };
+
+  if (!is_numeric(x["v"]) || !is_numeric(x["w"])) {
+    stop("Columns `v` and `w` must be numeric.");
+  }
+
+  // Extract the item weights and values as vectors
+  NumericVector weights = x["w"];
+  NumericVector values  = x["v"];
+
+  if (is_true(any(is_na(values))) || is_true(any(is_na(weights)))) {
+    stop("Columns `v` and `w` must not contain missing values.");
+  }
+
+  if (!is_true(all(values > 0)) || !is_true(all(weights > 0))) {
+    stop("Columns `v` and `w` must only contain positive values.");
+  }
+
+  if (!is_numeric(W_input) || Rf_length(W_input) != 1 ||
+      ISNAN(Rf_asReal(W_input)) || !(Rf_asReal(W_input) > 0)) {
+    stop("`W` must be a positive number.");
+  }
+
+  double W = Rf_asReal(W_input);
+
+  // n items
+  int n = x.nrows();
+
+  // Variables to keep track of the best solution
+  double best_value = 0;
+  IntegerVector best_elements(0);
+
+  // Number of possible combinations: 2^n
+  std::uint64_t number_of_combinations = std::uint64_t(1) << n;
+
+  // Generate all possible combinations of items
+  for (std::uint64_t i = 0; i < number_of_combinations; i++) {
+
+    // Logical combination in binary representation ex: {000, 001, ..., 111} for n = 3
+    LogicalVector combination(n);
+    for (int j = 0; j < n; j++) {
+      combination[j] = ((i >> j) & 1) != 0;
+    }
+    NumericVector selected_weights = weights[combination];
+    NumericVector selected_values  = values[combination];
+    double total_weight = sum(selected_weights);   // sum all TRUE values
+    double total_value  = sum(selected_values);    // sum all TRUE values
+
+    // Check if the combination is valid and better than the best found so far
+    if (total_weight <= W && total_value > best_value) {
+      best_value = total_value;
+      // Equivalent to which(combination): R row indices start at 1
+      IntegerVector row_indices = seq_len(n);
+      best_elements = row_indices[combination];
+    }
+  }
+
+  // Return the result in a list, using R's rounding convention
+  return List::create(
+    Named("value")    = R::fround(best_value, 0),
+    Named("elements") = best_elements
+  );
+}
 ```
 
-## 
 
+Brute force in R (`a`) vs the same algorithm in C++ through Rcpp (`b`, `fast = TRUE`), for n = 16 objects.
 
+```{r}
+brute_force_knapsack_fast <- function(x, W) {
+  brute_force_knapsack(x = x, W = W, fast = TRUE)
+}
+
+res_cpp <- compare_functions(
+  brute_force_knapsack, brute_force_knapsack_fast,
+  args = list(x = knapsack_objects[1:16, ], W = 3500)
+)
+
+res_cpp$timings
+```
+
+```{r, echo=FALSE}
+speedup <- as.numeric(res_cpp$timings$median[1]) /
+  as.numeric(res_cpp$timings$median[2])
+
+cat("The R version takes about", format(res_cpp$timings$median[1]),
+    "and the C++ version about", format(res_cpp$timings$median[2]),
+    "(median).")
+```
+
+The C++ implementation showed a modest reduction in median execution time compared with the R version. Translating the code into C++ improved execution time in this benchmark. But the algorithm’s exponential growth in computational cost is still a obvious problem.

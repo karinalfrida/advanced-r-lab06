@@ -14,11 +14,14 @@ Authors@R: c(
       role = c("aut")
     )
   )
-Description: This package for lab06 in the 732A94 course focuses on writing fast R code. 
-    Three different techniques are implemented for the knapsack problem.
-    1,  Brute force search.
+Description: This package for lab06 in the 732A94 course focuses on writing fast R code.
+ Three different techniques are implemented for the knapsack problem
+    .
+    1. Brute force search.
     2. Dynamic programming.
-    3. Greedy Heuristic.  
+    3. Greedy Heuristic.
+    .
+    The execution characteristics of different the implemetnation versions are then investigated.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
