@@ -9,6 +9,9 @@ library(dplyr)
 #' @param W A single positive number giving the weight capacity of the
 #'   knapsack.
 #'
+#' @param fast A logical value. If \code{TRUE}, the function will use a C++.
+#'   Default to \code{FALSE}
+#'
 #' @returns A list with two elements:
 #'   \describe{
 #'     \item{\code{value}}{The maximum total value of the knapsack, rounded to
@@ -30,7 +33,7 @@ library(dplyr)
 #' items <- data.frame(v = c(10, 40, 30, 50),
 #'                     w = c(5, 4, 6, 3))
 #' brute_force_knapsack(x = items, W = 10)
-brute_force_knapsack_tidyverse2 <- function(x,W){
+brute_force_knapsack_tidyverse2 <- function(x,W, fast = FALSE){
   stopifnot(
     "`x` must be a data.frame." =
       is.data.frame(x),
@@ -82,5 +85,5 @@ brute_force_knapsack_tidyverse2 <- function(x,W){
       elements = which(result$combination[[1]])
     ))()
 
-  return(knapsack_packed5)
+  return(knapsack_packed_5)
 }

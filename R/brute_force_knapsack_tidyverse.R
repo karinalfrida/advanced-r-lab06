@@ -9,6 +9,9 @@ library(dplyr)
 #' @param W A single positive number giving the weight capacity of the
 #'   knapsack.
 #'
+#' @param fast A logical value. If \code{TRUE}, the function will use a C++.
+#'   Default to \code{FALSE}
+#'
 #' @returns A list with two elements:
 #'   \describe{
 #'     \item{\code{value}}{The maximum total value of the knapsack, rounded to
@@ -63,7 +66,7 @@ brute_force_knapsack_tidyverse <- function(x,W){
     ) |>
     dplyr::filter(weight <= W) |>
     dplyr::arrange(desc(value)) |>
-    head(1) |>
+    utils::head(1) |>
     dplyr::select(combination, value) |>
     (function(result) list(
       value = round(result$value[[1]]),
