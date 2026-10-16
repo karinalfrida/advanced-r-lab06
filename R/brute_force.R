@@ -4,6 +4,9 @@
 #'   \code{v} (item values) and \code{w} (item weights).
 #' @param W A single positive number giving the weight capacity of the
 #'   knapsack.
+#' @param fast A logical value. If \code{TRUE}, the function will use a C++.
+#'   Default to \code{FALSE}
+#'
 #'
 #' @returns A list with two elements:
 #'   \describe{
@@ -24,7 +27,13 @@
 #' items <- data.frame(v = c(10, 40, 30, 50),
 #'                     w = c(5, 4, 6, 3))
 #' brute_force_knapsack(x = items, W = 10)
-brute_force_knapsack <- function(x,W) {
+brute_force_knapsack <- function(x,W, fast = FALSE) {
+
+  # If fast = TRUE, use the C++ implementation
+  if (fast) {
+    return(knapsack_cpp(x, W))
+  }
+
     # Validate inputs
      stopifnot(
     "`x` must be a data.frame." =

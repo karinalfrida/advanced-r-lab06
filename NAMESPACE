@@ -9,6 +9,7 @@ export(greedy_knapsack)
 export(greedy_knapsack_tidyverse)
 export(knapsack_dynamic)
 export(random_numbers_for_knapsack)
+importFrom(Rcpp,sourceCpp)
 importFrom(dplyr,
   arrange,
   filter,
@@ -20,3 +21,4 @@ importFrom(purrr,
   map,
   map_dbl
 )
+useDynLib(lab06, .registration = TRUE)
