@@ -102,52 +102,53 @@ cat("It takes about", format(runs$median[runs$n == 16]), "(median)")
 The dynamic programming version is based on an algorithm described on [Wikipedia](https://en.wikipedia.org/wiki/Knapsack_problem#Dynamic_programming_in-advance_algorithm "Knapsack algorithms"). Here we create a matrix which the algorithm then walks through line by line, comparing object combinations, having the best one ready when the last element is processed.
 
 ```{r, eval = FALSE, echo = TRUE}
+
 knapsack_dynamic <- function(x,W){
 
   # / input validation code not shown here, see source code in package/ *
 
   # n items
   n <- nrow(x)
-
+  
   # row and column for zero objects/capacity
   M <- matrix(0, nrow = n + 1, ncol = W + 1)
-
+  
   for (i in seq_len(n)) {
     for (w in 0:W) {
-
+      
       # row i+1 in matrix corresponds to object i in x
       if (x$w[i] > w) {
         M[i + 1, w + 1] <- M[i, w + 1]
       } else {
         exclude <- M[i, w + 1]
         include <- x$v[i] + M[i, w - x$w[i] + 1]
-
+        
         M[i + 1, w + 1] <- max(exclude, include)
       }
     }
   }
-
+  
   best_value <- M[n+1, W+1]
-
+  
   # trace back to find which items are selected
   items_selected <- integer(0)
+  w <- W # added in revision
+  
   for (i in n:1) {
-
+    
     if (M[i + 1, w + 1] != M[i, w + 1]) {
-
+      
       # object i was included
       items_selected <- c(i, items_selected)
-
+      
       # subtract its weight
       w <- w - x$w[i]
     }
   }
-
-  return(list(value = best_value, items = items_selected))
-
-
+  
+  return(list(value = best_value, elements = items_selected))
+  
 }
-
 ```
 
 *How much time does it take to run the algorithm for n = 500 objects?*
@@ -206,11 +207,9 @@ res_greed[, c("min", "median", "itr/sec", "mem_alloc")]
 cat("It takes about", format(res_greed$median), "(median)")
 ```
 
-
 ## Profiling and optimizing the code
 
-We created a function `compare_functions` for benchmarking paris of functions. 
-
+We created a function `compare_functions` for benchmarking paris of functions.
 
 ```{r, eval = FALSE, echo = TRUE}
 compare_functions <- function(fun_a, fun_b, args,
@@ -285,7 +284,6 @@ greedy_knapsack_tidyverse <- function(x, W) {
 
 ```
 
-
 *What performance gain could you get by trying to improve your code?*
 
 Base R (`a`) vs tidyverse (`b`) versions, relative to the fastest (= 1).
@@ -313,7 +311,6 @@ compare_functions(brute_force_knapsack, brute_force_knapsack_matrix,
 ```
 
 To look further into what parts of the `brute_force_knapsack_tidyverse` function are the "heaviest", we did a bench mark test for the pipe sequence split into parts.
-
 
 ```{r}
 
@@ -376,7 +373,6 @@ benchmark_results <- dplyr::bind_rows(
   
 ```
 
-
 Somewhat to our surprise, the results indicate that the most demanding parts of the `brute_force_knapsack_tidyverse` function is the weights and values assigments to the objects, and the creation of the logical representation of the combinations - not the arrange() call we anticipated to find:
 
 ```{r, echo = FALSE}
@@ -392,7 +388,7 @@ benchmark_results |>
 
 We did a Rccp/C++ implementation of the brute force algorithm to compare its execution speed with the "original" R code implementation. The C++ version is run when the `fast` parameter is set to `TRUE` when calling the `brute_force` function.
 
-```cpp
+``` cpp
 #include <Rcpp.h>
 #include <cstdint>
 using namespace Rcpp;
@@ -478,7 +474,6 @@ List knapsack_cpp(SEXP x_input, SEXP W_input) {
   );
 }
 ```
-
 
 Brute force in R (`a`) vs the same algorithm in C++ through Rcpp (`b`, `fast = TRUE`), for n = 16 objects.
 
