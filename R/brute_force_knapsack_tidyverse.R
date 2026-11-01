@@ -9,9 +9,6 @@ library(dplyr)
 #' @param W A single positive number giving the weight capacity of the
 #'   knapsack.
 #'
-#' @param fast A logical value. If \code{TRUE}, the function will use a C++.
-#'   Default to \code{FALSE}
-#'
 #' @returns A list with two elements:
 #'   \describe{
 #'     \item{\code{value}}{The maximum total value of the knapsack, rounded to

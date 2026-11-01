@@ -35,7 +35,7 @@ knapsack_dynamic <- function(x,W){
     "Columns `v` and `w` must not contain missing values." =
       !anyNA(x[, c("v", "w")]),
     "Columns `v` and `w` must only contain finite, positive values." =
-      all((x$v>0), (x$w > 0), is.finite(x$v), is.finite(x$v)),
+      all((x$v>0), (x$w > 0), is.finite(x$v), (x$v > 0)), # corrected in revision
     "`W` must be a positive number." =
       is.numeric(W) & length(W) == 1 && !is.na(W) & W > 0
   )
@@ -65,6 +65,8 @@ knapsack_dynamic <- function(x,W){
 
   # trace back to find which items are selected
   items_selected <- integer(0)
+  w <- W # added in revision
+
   for (i in n:1) {
 
     if (M[i + 1, w + 1] != M[i, w + 1]) {
